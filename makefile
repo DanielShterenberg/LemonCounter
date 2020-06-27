@@ -1,17 +1,17 @@
 send-path:
 	curl --location --request POST 'http://127.0.0.1:5000/add_words' \
 	--header 'Content-Type: application/json' \
-	--data-raw '{"data": "./mynameis.txt"}'
-
-send-string:
-	curl --location --request POST 'http://127.0.0.1:5000/add_words' \
-	--header 'Content-Type: application/json' \
-	--data-raw '{"data": "Hi! My name is (what?), my name is (who?), my name is sliky Slim Shady"}'
+	--data-raw '{"data": "$(path)"}'
 
 send-url:
 	curl --location --request POST 'http://127.0.0.1:5000/add_words' \
 	--header 'Content-Type: application/json' \
-	--data-raw '{"data": "http://textfiles.com/adventure/aencounter.txt"}'
+	--data-raw '{"data": "$(url)"}'
+
+send-text:
+	curl --location --request POST 'http://127.0.0.1:5000/add_words' \
+	--header 'Content-Type: application/json' \
+	--data-raw '{"data": "$(text)"}'
 
 count:
 	curl --location --request GET 'http://127.0.0.1:5000/count?word=$(word)'
@@ -19,5 +19,5 @@ count:
 reset-counter:
 	curl --location --request POST 'http://127.0.0.1:5000/reset'
 
-get-all-counts:
+count-all:
 	curl --location --request GET 'http://127.0.0.1:5000/all-counts'
