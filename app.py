@@ -15,21 +15,21 @@ logging.basicConfig(filename='logs.log', level=logging.INFO)
 
 @app.route('/all-counts', methods=['GET'])
 def all_counts():
-    return str(word_counter)
+    return str(word_counter), 200
 
 
 @app.route('/reset', methods=['POST'])
 def reset_dict():
     word_counter.clear()
-    return "Success"
+    return "Counter has been reset successfully", 200
 
 
 @app.route('/count', methods=['GET'])
 def count():
     word = request.args.get('word')
     if word not in word_counter:
-        return str(0)
-    return str(word_counter[word])
+        return str(0), 200
+    return str(word_counter[word]), 200
 
 
 # Decided not to use multipart but rather assume that I have the local file on my environment. I didn't want to start
@@ -54,7 +54,6 @@ def add_words():
 
 # https://stackoverflow.com/questions/7160737/python-how-to-validate-a-url-in-python-malformed-or-not/38020041
 def is_url(url):
-    # todo: define in some global place.
     regex = re.compile(
         r'^(?:http|ftp)s?://'  # http:// or https://
         r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...

@@ -5,27 +5,27 @@ import multiprocessing as mp
 import os
 import re
 import time
+from collections import Counter
 
 import urllib3
 
 from conf import get_allowed_mime_types, get_number_of_cores_to_use, CHUNK_SIZE
 
 
-# Example: "data": "Hi! My name is (what?), my name is (who?), my name is sliky Slim Shady"
 def count_words_from_string(word_counter, raw_data):
     update_counters(word_counter, raw_data)
 
 
-# example: "https://www.w3.org/TR/PNG/iso_8859-1.txt"
 def count_words_from_url(word_counter, url):
     http = urllib3.PoolManager()
     r = http.request('GET', url, preload_content=False)
+
+    # prevents the file from being closed.
     r.__class__ = ExplicitlyClosedHttpResponse
     for line in io.TextIOWrapper(r):
         update_counters(word_counter, line)
 
 
-# Example: "../mynameis.txt"
 def count_words_from_path(word_counter, path):
     logging.info("data is a path type")
     start_time = time.time()
@@ -39,7 +39,7 @@ def count_words_from_path(word_counter, path):
     parellalize_count(word_counter, path)
 
     end_time = time.time()
-    logging.info(f"Total processing time: {end_time - start_time} ms")
+    logging.info(f"Total processing time: {end_time - start_time} sec")
 
 
 def parellalize_count(word_counter, path):
@@ -78,20 +78,18 @@ def generate_chunks(path, size=CHUNK_SIZE):
 def process_wrapper(word_counter, path, chunk_start, chunk_size):
     with open(path, "r+") as f:
         f.seek(chunk_start)
-        lines = f.read(chunk_size).splitlines()
-        for line in lines:
-            update_counters(word_counter, line)
-    print(word_counter)
+        lines = f.read(chunk_size)
+        update_counters(word_counter, lines)
 
 
 def update_counters(word_counter, line):
     line = filter_line(line)
-
-    for word in re.findall(r'\w+', line):
-        if word in word_counter:
-            word_counter[word] += 1
+    d = Counter(map(lambda x: x.lower(), re.findall(r'\w+', line)))
+    for word, times in d.items():
+        if word not in word_counter:
+            word_counter[word] = times
         else:
-            word_counter[word] = 1
+            word_counter[word] += times
 
 
 def filter_line(line):
