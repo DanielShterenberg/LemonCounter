@@ -7,37 +7,50 @@ A simple string sent in the request.
 A file path (the contents of the file will be used as input).  
 A URL (the data returned from the URL will be used as input).
 
-2.  A 'word statistics' endpoint. The endpoint receives a word and returns the number of times the word appeared so far (in all previous calls)
+2.  A 'word statistics' endpoint. The endpoint receives a word and returns the number of times the word appeared so far 
+(in all previous calls).
 
 
+## Implementation
+The task was implemented using the Flask framework, and it did not involve any DBs.In order to store the counters, 
+I simply used a dictionary (which of course can be improved by using Redis for instance).  
+In order to process large files, I split the file into several chunks and processed each chunk with a different process.
 
 ## How to use:
-In the attached project, you can find a makefile which contains 6 commands.  
-`make path="<path>" send-path` sending a POST request to our service with a path to local file.  
-For example you can try `make path="./mynameis.txt" send-path`.  
+After you run the project, you can use the makefile in order to send requests to the service, or alternatively, 
+you can use the attached postman collection.
 
-`make url="<url>" send-url` sending a POST request to our service with a url of a .txt file.   
-For example you can try `make url="http://textfiles.com/adventure/aencounter.txt" send-url`.  
+- In case you would prefer to work with postman, you can import the `Lemonade.postman_collection.json` file. 
 
-`make text="<text>" send-text` sending a POST request to our service with a string which we want to process.   
-For example you can try `make text="Hi! My name is (what?), my name is (who?), my name is Slim Shady" send-text`.  
+- In the makefile, we have 6 commands:  
+  
+    `make path="<path>" send-path` sending a POST request to our service with a path to local file.  
+    For example you can try `make path="./mynameis.txt" send-path`.  
+    
+    `make url="<url>" send-url` sending a POST request to our service with a url of a .txt file.   
+    For example you can try `make url="http://textfiles.com/adventure/aencounter.txt" send-url`.  
+    
+    `make text="<text>" send-text` sending a POST request to our service with a string which we want to process.   
+    For example you can try `make text="Hi! My name is (what?), my name is (who?), my name is Slim Shady" send-text`.  
+    
+    `make word="<word>" count` sending a GET request to our service and returns the number of times `<word>` appeared so
+     far.  
+    For example you can try `make word="Shady" count`.  
+    
+    `make reset-counter` sending a POST request which resets our counters.  
+    
+    `make count-all` sending a GET request to our service and receives back the full counter-map.
 
-`make word="<word>" count` sending a GET request to our service and returns the number of times `<word>` appeared so far.  
-For example you can try `make word="Shady" count`.  
-
-`make reset-counter` sending a POST request which resets our counters.  
-
-`make count-all` sending a GET request to our service and receives back the full counter-map.
-
+ 
 
  
 --- 
 ### remarks:
 -  We are using the maximal amount of cores to process the file.
 If you would like to change it, you can find the function `get_number_of_cores_to_use` under `conf.py` file.
-
-
-
+- The `CHUNK_SIZE` is set to 4MB at the moment.  
+- I did not handle 'huge-url-files'. In case the .txt file in the passed url is really heavy, it will probably take a 
+lot of time to process the file. 
 
 ### Local benchmark tests:
 
