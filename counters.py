@@ -9,7 +9,7 @@ from collections import Counter
 
 import urllib3
 
-from conf import get_allowed_mime_types, get_number_of_cores_to_use, CHUNK_SIZE
+from conf import get_allowed_mime_types, get_number_of_cores_to_use, CHUNK_SIZE, save_counters
 
 
 def count_words_from_string(word_counter, raw_data):
@@ -90,6 +90,7 @@ def update_counters(word_counter, line):
             word_counter[word] = times
         else:
             word_counter[word] += times
+    save_counters(dict(word_counter))
 
 
 def filter_line(line):

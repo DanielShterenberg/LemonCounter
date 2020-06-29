@@ -5,12 +5,20 @@ from multiprocessing import Manager
 
 from flask import Flask, request, json
 
+from conf import load_counters, save_counters
 from counters import count_words_from_path, count_words_from_url, count_words_from_string
 
 app = Flask(__name__)
 manager = Manager()
 word_counter = manager.dict()
 logging.basicConfig(filename='logs.log', level=logging.INFO)
+
+
+@app.before_first_request
+def update_dict_on_start():
+    d = load_counters()
+    for word in d:
+        word_counter[word] = d[word]
 
 
 @app.route('/all-counts', methods=['GET'])
@@ -21,6 +29,7 @@ def all_counts():
 @app.route('/reset', methods=['POST'])
 def reset_dict():
     word_counter.clear()
+    save_counters(dict(word_counter))
     return "Counter has been reset successfully", 200
 
 
