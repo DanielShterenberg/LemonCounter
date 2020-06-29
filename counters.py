@@ -1,4 +1,3 @@
-import io
 import logging
 import mimetypes
 import multiprocessing as mp
@@ -7,7 +6,7 @@ import re
 import time
 from collections import Counter
 
-import urllib3
+import requests
 
 from conf import get_allowed_mime_types, get_number_of_cores_to_use, CHUNK_SIZE, save_counters
 
@@ -17,13 +16,10 @@ def count_words_from_string(word_counter, raw_data):
 
 
 def count_words_from_url(word_counter, url):
-    http = urllib3.PoolManager()
-    r = http.request('GET', url, preload_content=False)
+    r = requests.get(url, stream=True)
 
-    # prevents the file from being closed.
-    r.__class__ = ExplicitlyClosedHttpResponse
-    for line in io.TextIOWrapper(r):
-        update_counters(word_counter, line)
+    for chunk in r.iter_content(chunk_size=CHUNK_SIZE, decode_unicode=True):
+        update_counters(word_counter, chunk)
 
 
 def count_words_from_path(word_counter, path):
@@ -96,9 +92,3 @@ def update_counters(word_counter, line):
 def filter_line(line):
     line = re.sub(r'[^A-Za-z\s]+', ' ', line)
     return line.lower()
-
-
-class ExplicitlyClosedHttpResponse(urllib3.HTTPResponse):
-    @property
-    def closed(self):
-        return self._fp.closed

@@ -49,12 +49,11 @@ you can use the attached postman collection.
 -  We are using the maximal amount of cores to process the file.
 If you would like to change it, you can find the function `get_number_of_cores_to_use` under `conf.py` file.
 - The `CHUNK_SIZE` is set to 4MB at the moment.  
-- I did not handle 'huge-url-files'. In case the .txt file in the passed url is really heavy, it will probably take a 
-lot of time to process the file. 
 - I assume the file data.pkl exists. I experienced some issues with creating it on server starts (when not existing) and didn't want to keep wasting time on this.
 
 ### Local benchmark tests:
 
+Paths:  
 File size: ~225MB  
 Number of processes: 10  
 Average job time: 19.5 sec.
@@ -62,3 +61,9 @@ Average job time: 19.5 sec.
 File Size: ~700MB.  
 Number of processes: 10.  
 Average job time: 55 sec.
+
+URLs:   
+link: "http://norvig.com/big.txt"  
+Average job time: 19 sec.
+
+
